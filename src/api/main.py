@@ -2,11 +2,12 @@
 import uuid
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-
-from src.database import get_db
-from src.model import ScanJob
+from src.database import engine, get_db
+from src.model import Base, ScanJob
 from src.schemas import ScanRequest, ScanResponse
 from src.workers.tasks import process_osint_scan
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="OSINT Engine API",
