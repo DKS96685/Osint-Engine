@@ -1,7 +1,6 @@
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 # Read from environment variable (set by docker-compose), fallback to local dev
 SQLALCHEMY_DATABASE_URL = os.environ.get(
@@ -15,8 +14,11 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 # Each instance of this SessionLocal will be a database session
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# All our database models will inherit from this Base class
-Base = declarative_base()
+
+# SQLAlchemy 2.0-style declarative base
+class Base(DeclarativeBase):
+    pass
+
 
 # Dependency to get the database session in our API endpoints
 def get_db():
@@ -25,7 +27,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-
-#Why we are doing this (Plumbing): This script acts as the master key. The get_db function is especially important—it ensures that every time a user makes an API request, we open a database connection, do our work, and safely close it so the server doesn't crash from too many open connections.

@@ -2,8 +2,8 @@
 import uuid
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from src.database import engine, get_db
-from src.model import Base, ScanJob
+from src.database import engine, get_db, Base
+from src.model import ScanJob
 from src.schemas import ScanRequest, ScanResponse
 from src.workers.tasks import process_osint_scan
 
@@ -17,13 +17,13 @@ app = FastAPI(
 
 
 @app.get("/health")
-def health_check():
+def health_check() -> dict:
     """Quick health check — the Waiter is alive."""
     return {"status": "ok"}
 
 
 @app.post("/scans/", response_model=ScanResponse)
-def create_scan(request: ScanRequest, db: Session = Depends(get_db)):
+def create_scan(request: ScanRequest, db: Session = Depends(get_db)) -> ScanResponse:
     """
     Take the customer's order:
     1. Create a record in the Order Book (PostgreSQL)
@@ -45,7 +45,7 @@ def create_scan(request: ScanRequest, db: Session = Depends(get_db)):
 
 
 @app.get("/scans/{job_id}")
-def get_scan_status(job_id: str, db: Session = Depends(get_db)):
+def get_scan_status(job_id: str, db: Session = Depends(get_db)) -> dict:
     """Check on an order's status."""
     scan = db.query(ScanJob).filter(ScanJob.id == job_id).first()
     if not scan:
