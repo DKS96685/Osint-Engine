@@ -1,10 +1,13 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# This is the connection string to your Docker PostgreSQL container
-# Format: postgresql://user:password@host:port/database_name
-SQLALCHEMY_DATABASE_URL = "postgresql://admin:password@localhost:5432/osint_db"
+# Read from environment variable (set by docker-compose), fallback to local dev
+SQLALCHEMY_DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://osint:osint123@localhost:5432/osint_db"
+)
 
 # The engine is the core interface to the database
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
