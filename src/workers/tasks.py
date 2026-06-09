@@ -3,6 +3,9 @@ import os
 import time
 from celery import Celery
 
+from src.database import SessionLocal
+from src.model import ScanJob
+
 # Read broker/backend URLs from environment, falling back to localhost for local dev
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
@@ -35,8 +38,6 @@ def process_osint_scan(self, job_id: str, target: str):
 
     # Update DB status to 'processing'
     try:
-        from src.database import SessionLocal
-        from src.model import ScanJob
         db = SessionLocal()
         job = db.query(ScanJob).filter(ScanJob.id == job_id).first()
         if job:

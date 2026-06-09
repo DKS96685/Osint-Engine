@@ -39,7 +39,7 @@ def create_scan(request: ScanRequest, db: Session = Depends(get_db)) -> ScanResp
     db.refresh(new_scan)
 
     # Pin the ticket — hand off to the Chefs
-    process_osint_scan.delay(job_id, request.target)
+    process_osint_scan.delay(job_id, request.target)  # type: ignore
 
     return ScanResponse(job_id=new_scan.id, status=new_scan.status)
 
